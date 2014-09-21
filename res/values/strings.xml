@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">SnookerCalculator</string>
+	<string name="calcResultPlayer1">calcResultPlayer1</string>
+	<string name="calcResultPlayer2">calcResultPlayer2</string>
+	<string name="calcResult">calcResult</string>
+</resources>
