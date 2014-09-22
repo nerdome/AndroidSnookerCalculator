@@ -31,7 +31,17 @@ public class MyActivity extends Activity {
 				int remainingPoints = bundle.getInt("remainingPoints");
 				((TextView) findViewById(R.id.scorePlayer1)).setText("Score: " + String.valueOf(scorePlayer1));
 				((TextView) findViewById(R.id.scorePlayer2)).setText("Score: " + String.valueOf(scorePlayer2));
-				((TextView) findViewById(R.id.remainingPointsTextView)).setText("Remaining points: " + String.valueOf(remainingPoints));
+				((TextView) findViewById(R.id.remainingPointsTextView)).setText("Remaining points: " + String.valueOf(remainingPoints)); //TODO why doesn't it print out remaining points when one player won?
+				if (remainingPoints == 0) {
+					TextView winnerTextView = (TextView) findViewById(R.id.remainingPointsTextView);
+					if (scorePlayer1 > scorePlayer2) {
+						winnerTextView.setText("Player 1 won!");
+					} else if (scorePlayer2 > scorePlayer1) {
+						winnerTextView.setText("Player 2 won!");
+					} else {
+						winnerTextView.setText("Tie! Respotted Black!");
+					}
+				}
 			}
 		};
 	}
