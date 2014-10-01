@@ -1,9 +1,14 @@
 package de.adornis.snookercalculator;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -13,6 +18,23 @@ public class MyActivity extends Activity {
 	private Table table1;
 	private Handler uiHandler;
 
+	private TestService testService;
+	private ServiceConnection serviceConnection = new ServiceConnection () {
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			Log.e("MyActivity", "onServiceConnected");
+			TestService.TestBinder testBinder = (TestService.TestBinder) service;
+			testService = testBinder.getService();
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			Log.e("MyActivity", "onServiceDisconnected");
+		}
+	};
+
+
 	/**
 	 * Called when the activity is first created.
 	 */
@@ -20,6 +42,12 @@ public class MyActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		Intent serviceIntent = new Intent(this, TestService.class);
+		bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
+		Log.e("MyActivity", "bound service...hopefully?");
+		Log.e("MyActivity", testService != null ? "service exists" : "nooooooo");
+
 		table1 = new Table();
 		table1.resetTable();
 		uiHandler = new Handler() {
@@ -31,9 +59,9 @@ public class MyActivity extends Activity {
 				int remainingPoints = bundle.getInt("remainingPoints");
 				((TextView) findViewById(R.id.scorePlayer1)).setText("Score: " + String.valueOf(scorePlayer1));
 				((TextView) findViewById(R.id.scorePlayer2)).setText("Score: " + String.valueOf(scorePlayer2));
-				((TextView) findViewById(R.id.remainingPointsTextView)).setText("Remaining points: " + String.valueOf(remainingPoints)); //TODO why doesn't it print out remaining points when one player won?
+				((TextView) findViewById(R.id.remainingPointsTextView)).setText("Remaining points: " + String.valueOf(remainingPoints));
 				if (remainingPoints == 0) {
-					TextView winnerTextView = (TextView) findViewById(R.id.remainingPointsTextView);
+					TextView winnerTextView = (TextView) findViewById(R.id.winner);
 					if (scorePlayer1 > scorePlayer2) {
 						winnerTextView.setText("Player 1 won!");
 					} else if (scorePlayer2 > scorePlayer1) {
@@ -89,21 +117,13 @@ public class MyActivity extends Activity {
 				tableInfo.putInt("scorePlayer2", scorePlayer2);
 				Message tableUpdate = uiHandler.obtainMessage();
 				tableUpdate.setData(tableInfo);
-//				Log.e("working", "working hard now");
-//				for(int i = 0; i < 99999999; i++); // freezes ui when executing a few parallel
-//				Log.e("working", "working was hard...");
 				uiHandler.sendMessage(tableUpdate);
-
-//				new Calculator((TextView) findViewById(R.id.remainingPointsTextView)).execute(player, ballValueInt);
 			}
 		}).start();
-//		TextView remainingPointsTextView = (TextView) findViewById(R.id.remainingPointsTextView);
-//		remainingPointsTextView.setText(String.valueOf(table1.remainingPoints()));
 	}
 
 	@Override
 	protected void onDestroy() {
-//		finish();
 		super.onDestroy();
 	}
 }
